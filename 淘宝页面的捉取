@@ -1,0 +1,87 @@
+"""
+程序的结构设计
+步骤1：提交商品搜索请求，循环获取页面。
+步骤2：对于每个页面，提取商品名称和价格信息。
+步骤3：将信息输出到屏幕上。
+"""
+
+"""
+首页：
+
+
+"""
+import requests
+import re
+
+def getHTMLText(url):
+    try:
+        header= {
+            'authority': 's.taobao.com',
+            'cache-control': 'max-age=0',
+            'upgrade-insecure-requests': '1',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'sec-fetch-user': '?1',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-mode': 'navigate',
+            'referer': 'https://www.taobao.com/',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            'cookie': 'thw=cn; cna=U5QcF9IeeBICAXjveeGlVl6N; sgcookie=EUZ%2FBLgTOx1MiwiaiJIYa; uc3=vt3=F8dBxdGI5PvSrdgP%2BQU%3D&id2=UNky7T70guizbA%3D%3D&lg2=W5iHLLyFOGW7aA%3D%3D&nk2=F5RAQ1lB1q9glyw%3D; lgc=tb513218950; uc4=id4=0%40Ug44U9n%2FDltcNrugVQWibA11Ya65&nk4=0%40FY4L7%2FmsNrbSP0OB77sPOiCmRMtr3A%3D%3D; tracknick=tb513218950; _cc_=VT5L2FSpdA%3D%3D; tfstk=c-6dBuACZP4HUL6M99FMF0No1BCRZMzJ5DToeutYRxLKV1kRiLWcH8QbO3GK6lC..; mt=ci=10_1; enc=%2FezykJZ%2FeJmCrtr4c94XFEuTE%2BkaRULRstdt2Zb7aigAD3%2FSJ76q%2FTxEPjA%2FHCVdBBtsF1ry5KYD7Pvi5rnesQ%3D%3D; __guid=154677242.2025962641247480600.1586866599770.317; hng=CN%7Czh-CN%7CCNY%7C156; uc1=cookie14=UoTUPczwNQW77w%3D%3D; t=a2ae200ad40e3b44f3b7c26526a8ff07; cookie2=1dfcb704f3b9801d605130bab1b1939b; v=0; _tb_token_=51d84347e337b; JSESSIONID=D0ED8AC019213D1FF89EE168E19723FD; alitrackid=www.taobao.com; lastalitrackid=www.taobao.com; monitor_count=1; isg=BGpqwNpowL0McUxcgsPrXfPxu9AM2-418yuatvQjHL1DJwrh3G_SR3RVs1M712bN; l=eBT9czbnQpUgqRVbBOfNhm-EQg_TIIRAgul2TSUDiT5P_P1pSwrFWZXOwqY9CnGVh6YXR3rEQAfvBeYBqQAonxv92j-la_Hmn',
+        }
+        r = requests.get(url,headers=header,timeout=30)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        return r.text
+    except:
+        return "获取页面失败"
+
+def parsePage(ilt,html):
+    try:
+        plt = re.findall(r'\"view_price\"\:\"[\d\.]*\"',html)
+        tlt = re.findall(r'\"raw_title\"\:\".*?\"',html)
+        for i in range(len(plt)):
+            price = eval(plt[i].split(':')[1])
+            title = eval(tlt[i].split(':')[1])
+            ilt.append([price,title])
+    except:
+        print('异常')
+
+# def parsePage(ilt,html):
+#     try:
+#         plt = re.findall(r'\"view_price\"\:\"[\d\.]*\"',html)
+#         tlt = re.findall(r'\"raw_title\"\:\".*?\"',html)
+#         for i in range(len(plt)):
+#             price = eval(plt[i].split(':')[1])
+#             title = eval(tlt[i].split(':')[1])
+#             ilt.append([price,title])
+#     except:
+#         print('异常')
+
+
+def printGoodsList(ilt,html):
+    tplt = "{0:<3}\t{1:<30}\t{2:>6}"
+    print(tplt.format("序号","价格","名称"))
+    count = 0
+    for g in ilt:
+        count = count + 1
+        print(tplt.format(count,g[0],g[1]))
+
+
+def main():
+    goods = '大米'
+    depth = 2
+    num = 20
+    start_url = 'https://s.taobao.com/search?q='+goods
+    infoList = []
+    #输出结果进行一个变量
+    for i in range(depth):
+        try:
+            url = start_url + '&s=' + str(44*i)
+            html = getHTMLText(url)
+            parsePage(infoList,html)
+        except:
+            continue
+    printGoodsList(infoList,num)
+
+main()
