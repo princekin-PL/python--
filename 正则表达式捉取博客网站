@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: gbk -*-
 import requests
 import re
-lis = []
+urls = []
+titles = []
 try:
     url='http://www.eastmountyxz.com/'
     r = requests.get(url, timeout=30)
@@ -12,76 +13,35 @@ except:
 html = r.text
 res = r'http://blog.csdn.net/eastmount/article/details/\d{8}'
 # res = r"<a.*?href=.*?[\d]{8}\">.*?<\/a>"
-Html = re.findall(res,html,re.M)
-i=0
-
-print(Html)
-
-for url in Html:
+content = re.findall(res,html,re.M)
+for u in content:
+    res = r'href="([\s\S]+[\d]{8})">'  # 提取超链接
+    content = re.findall(res, u, re.M)
+    urls.append(content[0])
+    # print(content)
+    res = r'">([\s\S]+)</a>'  # 提取超链接
+    content = re.findall(res, u, re.M)
+    # print(content)
+    titles.append(content[0])
+# print(urls[0])
+# # 根据urls获取博文页面
+for url in urls:
+    # print(url)
     response = requests.get(url)
+    # print(urls[0])
     response.encoding = 'utf-8'
     html = response.text
 
     res = r'<div class="htmledit_views" id="content_views">([\s\S]+)</div>'
-    content = re.findall(res, html)
+    content = re.findall(res,html)
 
     res = r'<p>(.*?)<\/p>'
     res = re.compile(res, re.DOTALL)
-    content = re.findall(res, html)
+    content = re.findall(res,html)
     # 提取url的数字
-
     res = r"[\d]{8}"
     d = re.findall(res, url, re.M)
     savefilename = d[0] + '.txt'
     file = open(savefilename, 'w',encoding='utf-8')
     file.write(str(content))
     file.close();
-
-
-# print(type(content))
-# for i in content:
-
-# for i in Html:
-#     try:
-#         Bo = requests.get(i, timeout=30)
-#         Bo.raise_for_status()
-#         Bo.encoding = Bo.apparent_encoding
-#         BoHtml = Bo.text
-#         # print(BoHtml)
-#         # print('='*30)
-#         # res = r'h1 class="title-article">.*?<h1>'
-#         # content = re.findall(res,BoHtml)
-#
-#         res = r'<p>(.*?)<\/p>'
-#         # res = re.compile(res,re.DOTALL)
-#         content = re.findall(res,BoHtml,re.DOTALL)
-#
-#         res = r"[\d]{8}"
-#         d = re.findall(res,i)
-#         savefile = d[0]+'.txt'
-#         file = open(savefile,'w')
-#         file.write(str(content))
-#         file.close()
-#     except:
-#         print("解析网页出错")
-
-# for url in Html:
-#     # print(url)
-#     response = requests.get(url)
-#     # print(urls[0])
-#     response.encoding = 'utf-8'
-#     html = response.text
-#
-#     res = r'<div class="htmledit_views" id="content_views">([\s\S]+)</div>'
-#     content = re.findall(res, html)
-#
-#     res = r'<p>(.*?)<\/p>'
-#     res = re.compile(res, re.DOTALL)
-#     content = re.findall(res, html)
-#     # 提取url的数字
-#     res = r"[\d]{8}"
-#     d = re.findall(res, url, re.M)
-#     savefilename = d[0] + '.txt'
-#     file = open(savefilename, 'w')
-#     file.write(str(content))
-#     file.close();
