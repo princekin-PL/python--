@@ -1,0 +1,16 @@
+import requests
+headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'}
+url = "http://43.250.238.179:9090/showData"
+response = requests.get(url).json()   #把爬取到的json格式的网页转换成字典格式
+# for i in range(48):              #具体解析其中的图片源地址
+#     print(res.get("items")[i].get("pic_url"))
+# html = html.decode('utf-8')  # 对二进制码进行解码
+last_time = response['data']['times']
+gntotal = response['data']['gntotal']          # 累计确诊
+deathtotall = response['data']['deathtotal']   # 累计死亡
+sustotal = response['data']['sustotal']        # 现有疑似
+curetotal = response['data']['curetotal']      # 累计治愈
+econNum = response['data']['econNum']          # 现有确诊
+heconNum = response['data']['heconNum']        # 现有重症
+print(gntotal)
+#

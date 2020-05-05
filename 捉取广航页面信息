@@ -1,0 +1,21 @@
+import requests
+from bs4 import BeautifulSoup
+
+try:
+    r = requests.get('http://www.gzmtu.edu.cn',timeout=30)
+    r.raise_for_status()
+    r.encoding = r.apparent_encoding
+except:
+    print("failer")
+soup = BeautifulSoup(r.text,'html.parser')
+news = soup.find_all(attrs={"class":"oner-left"})
+print("新闻标题"+'\t'*10+"网址"+'\t'*5+"时间")
+for new in news:
+    tt = new.find('a')
+    print(tt.get_text()+'\t'*3+tt.get('href')+'\t'*3+new.next_sibling.get_text()[1:-1]+'\n')
+print("公告"+'\t'*10+"网址"+'\t'*5+"时间")
+ancs = soup.find_all(attrs={"class":"sec-left"})
+for anc in ancs:
+    tt = anc.find('a')
+    print(tt.get_text() + '\t' * 3 + tt.get('href') + '\t' * 3 + anc.next_sibling.get_text()[1:-1] + '\n')
+

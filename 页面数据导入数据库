@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+import MySQLdb
+# 连接数据库
+conn = MySQLdb.connect('127.0.0.1', 'root', '123', 'python',charset='utf8')
+cur = conn.cursor()
+cur.execute("""create table if not EXISTS gzhh(
+    id int(11) auto_increment PRIMARY KEY,
+    title VARCHAR(30),
+    href  VARCHAR(40),
+    dateval CHAR(6))
+    """)
+
+from bs4 import BeautifulSoup
+import urllib.request
+
+url = 'http://www.gzmtu.edu.cn/'
+page = urllib.request.urlopen(url)
+# print(page.read().decode('utf-8'))   #返回网页内容
+
+soup = BeautifulSoup(page, 'html.parser')
+
+# 获取“广航新闻”
+items = soup.find_all(attrs={"class": "oner-left"})
+for item in items:
+    # print item
+    tt = item.find('a')
+    print(tt.get_text())
+    print(tt.get('href'))
+    print(item.next_sibling.get_text()[1:-1])
+
+    title = tt.get_text()
+    href = tt.get('href')
+    dateval = item.next_sibling.get_text()[1:-1]
+# SQL语句，
+    sql = '''insert into gzhh (title,href,dateval) values(%s,%s,%s);'''
+    cur.execute(sql, (title,href,dateval))
+# print("输入成功")
+cur.close()
+conn.commit()
+conn.close()
